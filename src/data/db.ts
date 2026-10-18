@@ -5,6 +5,7 @@
  * Bump the version and add an `.upgrade()` when changing indexes or migrating data.
  */
 import Dexie, { type EntityTable } from 'dexie'
+import { mirrorMiddleware } from './pgMirror'
 import type {
   Budget,
   CalendarEvent,
@@ -59,6 +60,8 @@ export class HQDatabase extends Dexie {
       calendarSources: 'id',
       kv: 'key',
     })
+    // Records writes for the optional Postgres mirror; inert until startPgMirror() runs.
+    this.use(mirrorMiddleware)
   }
 }
 

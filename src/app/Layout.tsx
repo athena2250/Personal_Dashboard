@@ -93,7 +93,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-2.5 px-3 pt-1 pb-6">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 shadow-[0_6px_20px_-6px_rgba(139,92,246,0.7)]">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#5ac8fa] to-[#007aff] shadow-[0_6px_20px_-6px_rgba(0,122,255,0.6)]">
           <Sparkles className="h-4.5 w-4.5 text-white" />
         </div>
         <div>
@@ -301,7 +301,7 @@ export function Layout() {
         </div>
       </nav>
       <button
-        className="fixed right-4 bottom-20 z-30 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-blue-500 text-white shadow-xl lg:hidden"
+        className="fixed right-4 bottom-20 z-30 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#5ac8fa] to-[#007aff] text-white shadow-xl lg:hidden"
         aria-label="Quick add or search"
         onClick={() => setPaletteOpen(true)}
       >

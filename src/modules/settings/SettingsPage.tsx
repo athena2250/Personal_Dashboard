@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router'
-import { ArrowDown, ArrowUp, Database, Download, Eye, EyeOff, HardDrive, Plus, Settings as SettingsIcon, Trash2, Upload } from 'lucide-react'
+import { ArrowDown, ArrowUp, Database, DatabaseZap, Download, Eye, EyeOff, HardDrive, Plus, Settings as SettingsIcon, Trash2, Upload } from 'lucide-react'
 import type { EventCategory, Settings, WidgetPref } from '@/data/models'
 import { updateSettings } from '@/data/repos/settings'
 import { createBackup, eraseAllData, parseBackup, restoreBackup, type BackupFile, type BackupPreview } from '@/data/backup'
 import { loadDemoData, removeDemoData } from '@/data/demo'
 import { useDemoCount } from '@/data/hooks'
+import { retryPgMirror, usePgMirrorStatus } from '@/data/pgMirror'
 import { ensureInitialized } from '@/data/repos/settings'
 import { Button } from '@/components/ui/Button'
 import { Badge, Card, CardBody, CardHeader, PageHeader, Segmented } from '@/components/ui/display'
@@ -199,7 +200,7 @@ export function SettingsPage() {
         <CardHeader title="Storage & demo data" icon={<HardDrive className="h-4 w-4 text-muted" />} />
         <CardBody className="space-y-4 text-sm">
           <p className="text-fg-2">
-            All data is stored locally in this browser's IndexedDB (database “personal-hq”). It is not uploaded anywhere. Using another browser or device starts empty — move data with backup & restore.
+            All data is stored locally in this browser's IndexedDB (database “personal-hq”). When the app runs from the local dev/preview server it is also mirrored to your local Postgres (below); nothing goes to the internet. Using another browser or device starts empty — move data with backup & restore.
           </p>
           <div className="flex flex-wrap items-center gap-3 text-xs">
             <Badge>Used: {mb(storage?.usage)}</Badge>
@@ -245,6 +246,8 @@ export function SettingsPage() {
           </div>
         </CardBody>
       </Card>
+
+      <PostgresMirror />
 
       <Card id="backup">
         <CardHeader title="Backup & restore" subtitle="A single JSON file with everything: trackers, sessions, transactions, budgets, investments, events and settings." />
@@ -309,6 +312,37 @@ export function SettingsPage() {
       </Modal>
       <p className="pb-4 text-center text-xs text-muted">Personal HQ v1.0 · local-first · schema v{settings.schemaVersion}</p>
     </div>
+  )
+}
+
+function PostgresMirror() {
+  const pg = usePgMirrorStatus()
+  const label = { off: 'Not available', connecting: 'Connecting…', syncing: 'Syncing…', synced: 'Synced', error: 'Not syncing' }[pg.state]
+  const tone = pg.state === 'synced' ? 'good' : pg.state === 'error' ? 'bad' : 'default'
+  return (
+    <Card id="postgres">
+      <CardHeader title="Postgres mirror" subtitle="One-way copy of everything in this browser into your local Postgres. The app keeps working if Postgres is down; changes are sent when it is back." icon={<DatabaseZap className="h-4 w-4 text-muted" />} />
+      <CardBody className="space-y-3 text-sm">
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <Badge tone={tone}>{label}</Badge>
+          {pg.database && <Badge>{pg.database}</Badge>}
+          {pg.pending > 0 && <Badge tone="warn">{pg.pending} pending</Badge>}
+          {pg.lastSyncAt && <span className="text-muted">Last sync {new Date(pg.lastSyncAt).toLocaleTimeString()}</span>}
+          {pg.state === 'error' && (
+            <Button size="sm" variant="ghost" className="ml-auto" onClick={retryPgMirror}>
+              Retry now
+            </Button>
+          )}
+        </div>
+        {pg.error && <p className="text-bad-fg">{pg.error}</p>}
+        {pg.state === 'off' && <p className="text-fg-2">The mirror only runs under <code>npm run dev</code> or <code>npm run preview</code>, which host the local sync endpoint.</p>}
+        {pg.views.length > 0 && (
+          <p className="text-fg-2">
+            Each tracker has its own view in Postgres: <span className="text-muted">{pg.views.join(', ')}</span>
+          </p>
+        )}
+      </CardBody>
+    </Card>
   )
 }
 
