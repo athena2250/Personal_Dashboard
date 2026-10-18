@@ -1,0 +1,250 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* ───────────── Design tokens ───────────── */
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0e0e12;
+  --bg-glow-1: rgba(139, 92, 246, 0.1);
+  --bg-glow-2: rgba(59, 130, 246, 0.07);
+  --surface: #17171c;
+  --surface-2: #1e1e25;
+  --surface-3: #27272f;
+  --line: rgba(255, 255, 255, 0.07);
+  --line-strong: rgba(255, 255, 255, 0.13);
+  --fg: #ecebf3;
+  --fg-2: #b0afc0;
+  --muted: #7d7c90;
+  --accent: #8b5cf6;
+  --accent-2: #3b82f6;
+  --accent-fg: #ffffff;
+  --accent-soft: rgba(139, 92, 246, 0.14);
+  --ring: rgba(139, 92, 246, 0.55);
+  --good: #22c55e;
+  --good-fg: #4ade80;
+  --warn: #fab219;
+  --bad: #ef4444;
+  --bad-fg: #f87171;
+  --shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+
+  /* module identities */
+  --learning: #a78bfa;
+  --learning-soft: rgba(167, 139, 250, 0.13);
+  --spending: #fb7185;
+  --spending-soft: rgba(251, 113, 133, 0.12);
+  --wealth: #34d399;
+  --wealth-soft: rgba(52, 211, 153, 0.12);
+  --events: #38bdf8;
+  --events-soft: rgba(56, 189, 248, 0.12);
+
+  /* chart chrome (dataviz reference palette, validated vs #17171c) */
+  --chart-grid: #2a2a31;
+  --chart-axis: #3a3a42;
+  --chart-ink: #8f8ea2;
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+  --series-8: #e66767;
+
+  /* heatmap: one-hue violet ramp */
+  --heat-0: #212128;
+  --heat-1: #3b2a6b;
+  --heat-2: #5b3fb0;
+  --heat-3: #7c5ce6;
+  --heat-4: #b49cff;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f5f4f9;
+  --bg-glow-1: rgba(139, 92, 246, 0.08);
+  --bg-glow-2: rgba(59, 130, 246, 0.06);
+  --surface: #ffffff;
+  --surface-2: #f3f2f8;
+  --surface-3: #e9e8f1;
+  --line: rgba(20, 18, 40, 0.08);
+  --line-strong: rgba(20, 18, 40, 0.16);
+  --fg: #16151d;
+  --fg-2: #4d4c60;
+  --muted: #7a798c;
+  --accent: #7c3aed;
+  --accent-2: #2563eb;
+  --accent-soft: rgba(124, 58, 237, 0.1);
+  --ring: rgba(124, 58, 237, 0.45);
+  --good: #16a34a;
+  --good-fg: #15803d;
+  --warn: #d97706;
+  --bad: #dc2626;
+  --bad-fg: #dc2626;
+  --shadow: 0 1px 2px rgba(20, 18, 40, 0.05), 0 8px 24px -16px rgba(20, 18, 40, 0.18);
+
+  --learning: #7c3aed;
+  --learning-soft: rgba(124, 58, 237, 0.09);
+  --spending: #e11d48;
+  --spending-soft: rgba(225, 29, 72, 0.08);
+  --wealth: #059669;
+  --wealth-soft: rgba(5, 150, 105, 0.09);
+  --events: #0284c7;
+  --events-soft: rgba(2, 132, 199, 0.09);
+
+  --chart-grid: #ebeaf1;
+  --chart-axis: #d4d3dd;
+  --chart-ink: #6f6e82;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+  --series-7: #6250d6;
+  --series-8: #e34948;
+
+  --heat-0: #ecebf2;
+  --heat-1: #d9ccfb;
+  --heat-2: #b39af5;
+  --heat-3: #8b63ec;
+  --heat-4: #5b2fc9;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-soft: var(--accent-soft);
+  --color-good: var(--good);
+  --color-good-fg: var(--good-fg);
+  --color-warn: var(--warn);
+  --color-bad: var(--bad);
+  --color-bad-fg: var(--bad-fg);
+  --color-learning: var(--learning);
+  --color-learning-soft: var(--learning-soft);
+  --color-spending: var(--spending);
+  --color-spending-soft: var(--spending-soft);
+  --color-wealth: var(--wealth);
+  --color-wealth-soft: var(--wealth-soft);
+  --color-events: var(--events);
+  --color-events-soft: var(--events-soft);
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  --shadow-card: var(--shadow);
+}
+
+/* ───────────── Base ───────────── */
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(1200px 600px at 85% -10%, var(--bg-glow-1), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, var(--bg-glow-2), transparent 60%);
+  background-attachment: fixed;
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-3) transparent;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+dialog::backdrop {
+  background: rgba(5, 5, 10, 0.6);
+  backdrop-filter: blur(3px);
+}
+
+dialog[open] {
+  animation: dialog-in 160ms ease-out;
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 220ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Recharts tweaks */
+.recharts-cartesian-grid line {
+  stroke: var(--chart-grid);
+}
+.recharts-text {
+  fill: var(--chart-ink);
+  font-size: 11px;
+}
+.recharts-surface:focus,
+.recharts-wrapper:focus,
+.recharts-sector:focus {
+  outline: none;
+}
+
+input[type='date']::-webkit-calendar-picker-indicator,
+input[type='time']::-webkit-calendar-picker-indicator,
+input[type='month']::-webkit-calendar-picker-indicator {
+  filter: var(--picker-filter, none);
+  cursor: pointer;
+}
+[data-theme='dark'] {
+  --picker-filter: invert(0.8);
+}
