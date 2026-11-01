@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { ArrowRight, CalendarDays, CheckSquare, Clock, FileText, Search, TrendingUp, Wallet, LayoutGrid, Plus } from 'lucide-react'
+import { ArrowRight, CalendarDays, Clock, FileText, Search, TrendingUp, Wallet, LayoutGrid, Plus } from 'lucide-react'
 import { db } from '@/data/db'
 import { globalSearch, type SearchKind } from '@/domain/search'
 import { formatDate } from '@/lib/dates'
@@ -10,7 +10,6 @@ import { Kbd } from '@/components/ui/display'
 import { useQuickAdd, type QuickKind } from './QuickAdd'
 
 const KIND_META: Record<SearchKind, { label: string; icon: typeof Search }> = {
-  task: { label: 'Task', icon: CheckSquare },
   session: { label: 'Session', icon: Clock },
   record: { label: 'Record', icon: FileText },
   transaction: { label: 'Transaction', icon: Wallet },
@@ -20,7 +19,6 @@ const KIND_META: Record<SearchKind, { label: string; icon: typeof Search }> = {
 }
 
 const ACTIONS: { label: string; kind?: QuickKind; href?: string; keywords: string }[] = [
-  { label: 'Add task', kind: 'task', keywords: 'task todo new' },
   { label: 'Log learning session', kind: 'session', keywords: 'session learning study log time' },
   { label: 'Add expense', kind: 'expense', keywords: 'expense spend transaction' },
   { label: 'Add income', kind: 'income', keywords: 'income salary transaction' },
@@ -54,8 +52,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
 
   const corpus = useLiveQuery(async () => {
     if (!open) return null
-    const [tasks, sessions, records, trackers, transactions, investments, events] = await Promise.all([
-      db.tasks.toArray(),
+    const [sessions, records, trackers, transactions, investments, events] = await Promise.all([
       db.sessions.toArray(),
       db.records.toArray(),
       db.trackers.toArray(),
@@ -63,7 +60,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
       db.investments.toArray(),
       db.events.toArray(),
     ])
-    return { tasks, sessions, records, trackers, transactions, investments, events }
+    return { sessions, records, trackers, transactions, investments, events }
   }, [open])
 
   const results = useMemo(() => (corpus && q.trim() ? globalSearch(corpus, q, 30) : []), [corpus, q])
@@ -133,7 +130,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
                 setQ(e.target.value)
                 setActive(0)
               }}
-              placeholder="Search tasks, sessions, transactions, investments, events…"
+              placeholder="Search sessions, transactions, investments, events…"
               className="h-12 flex-1 bg-transparent text-sm outline-none placeholder:text-muted"
               aria-label="Search"
               role="combobox"
@@ -144,7 +141,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
             <Kbd>Esc</Kbd>
           </div>
           <div id="cmd-list" role="listbox" className="max-h-[60vh] overflow-y-auto p-2">
-            {actions.length > 0 && <div className="px-2 pt-1 pb-1 text-[11px] font-medium tracking-wide text-muted uppercase">Quick actions</div>}
+            {actions.length > 0 && <div className="label-os px-2 pt-1 pb-1 text-muted">Quick actions</div>}
             {actions.map((a) => {
               idx++
               const i = idx
@@ -164,7 +161,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
               )
             })}
             {q.trim() && (
-              <div className="px-2 pt-3 pb-1 text-[11px] font-medium tracking-wide text-muted uppercase">{results.length ? `Results (${results.length})` : 'No matching records'}</div>
+              <div className="label-os px-2 pt-3 pb-1 text-muted">{results.length ? `Results (${results.length})` : 'No matching records'}</div>
             )}
             {results.map((r) => {
               idx++

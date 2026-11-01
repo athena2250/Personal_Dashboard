@@ -5,7 +5,7 @@ import { cn } from '@/lib/util'
 
 export function Card({ className, children, as: As = 'section', ...rest }: { className?: string; children: ReactNode; as?: 'section' | 'div' | 'article' } & React.HTMLAttributes<HTMLElement>) {
   return (
-    <As className={cn('rounded-2xl border border-line bg-surface shadow-card', className)} {...rest}>
+    <As className={cn('glass-card rounded-2xl', className)} {...rest}>
       {children}
     </As>
   )
@@ -17,8 +17,8 @@ export function CardHeader({ title, subtitle, action, icon, className }: { title
       <div className="flex min-w-0 items-center gap-2.5">
         {icon}
         <div className="min-w-0">
-          <h3 className="truncate text-sm font-semibold text-fg">{title}</h3>
-          {subtitle && <p className="mt-0.5 text-xs text-muted">{subtitle}</p>}
+          <h3 className="truncate text-[15px] font-semibold text-fg">{title}</h3>
+          {subtitle && <p className="mt-0.5 text-xs leading-relaxed text-muted">{subtitle}</p>}
         </div>
       </div>
       {action && <div className="flex shrink-0 items-center gap-1.5">{action}</div>}
@@ -62,7 +62,7 @@ export function Dot({ color, className }: { color: string; className?: string })
 export function ProgressBar({ value, color = 'var(--accent)', className, label, height = 'h-1.5' }: { value: number; color?: string; className?: string; label?: string; height?: string }) {
   const pct = Math.max(0, Math.min(1, Number.isFinite(value) ? value : 0))
   return (
-    <div className={cn('w-full overflow-hidden rounded-full bg-surface-3', height, className)} role="progressbar" aria-valuenow={Math.round(pct * 100)} aria-valuemin={0} aria-valuemax={100} aria-label={label}>
+    <div className={cn('w-full overflow-hidden rounded-full bg-[var(--track)]', height, className)} role="progressbar" aria-valuenow={Math.round(pct * 100)} aria-valuemin={0} aria-valuemax={100} aria-label={label}>
       <div className="h-full rounded-full transition-[width] duration-500" style={{ width: `${pct * 100}%`, background: color }} />
     </div>
   )
@@ -75,7 +75,7 @@ export function ProgressRing({ value, size = 64, stroke = 7, color = 'var(--acce
   return (
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }} role="progressbar" aria-valuenow={Math.round(pct * 100)} aria-valuemin={0} aria-valuemax={100}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--surface-3)" strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--track)" strokeWidth={stroke} />
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - pct)} style={{ transition: 'stroke-dashoffset 600ms ease' }} />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center text-center">{children}</div>
@@ -111,10 +111,10 @@ export function Delta({ value, invert, suffix, format }: { value: number | null 
   const Icon = up ? ArrowUpRight : ArrowDownRight
   if (value === 0) return <span className="text-xs text-muted">No change{suffix ? ` ${suffix}` : ''}</span>
   return (
-    <span className={cn('inline-flex items-center gap-0.5 text-xs font-medium', good ? 'text-good-fg' : 'text-bad-fg')}>
+    <span className={cn('tabular inline-flex items-center gap-0.5 text-xs font-medium', good ? 'text-good-fg' : 'text-bad-fg')}>
       <Icon className="h-3.5 w-3.5" aria-hidden />
       {format ? format(Math.abs(value)) : `${Math.abs(value * 100).toFixed(1)}%`}
-      {suffix && <span className="ml-1 font-normal text-muted">{suffix}</span>}
+      {suffix && <span className="ml-1 font-sans font-normal tracking-normal text-muted">{suffix}</span>}
     </span>
   )
 }
@@ -139,14 +139,14 @@ export function StatCard({
   const inner = (
     <>
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-medium text-muted">{label}</span>
+        <span className="label-os text-muted">{label}</span>
         {icon && <span className={cn('flex h-8 w-8 items-center justify-center rounded-xl', toneBadge[tone])}>{icon}</span>}
       </div>
-      <div className="mt-2 text-2xl font-semibold tracking-tight text-fg">{value}</div>
+      <div className="stat-figure mt-2 text-2xl text-fg">{value}</div>
       {sub && <div className="mt-1 text-xs text-muted">{sub}</div>}
     </>
   )
-  const cls = cn('rounded-2xl border border-line bg-surface p-4 shadow-card', to && 'block transition-colors hover:border-line-strong', className)
+  const cls = cn('glass-card rounded-2xl p-4', to && 'block transition-colors hover:border-line-strong hover:bg-[var(--glass-card-hover)]', className)
   return to ? (
     <Link to={to} className={cls}>
       {inner}
@@ -162,8 +162,8 @@ export function PageHeader({ title, subtitle, actions, eyebrow, icon }: { title:
       <div className="flex min-w-0 items-center gap-3">
         {icon}
         <div className="min-w-0">
-          {eyebrow && <div className="mb-1 text-xs font-medium tracking-wide text-muted uppercase">{eyebrow}</div>}
-          <h1 className="truncate text-2xl font-semibold tracking-tight text-fg sm:text-[28px]">{title}</h1>
+          {eyebrow && <div className="label-os mb-1.5 text-muted">{eyebrow}</div>}
+          <h1 className="truncate text-2xl font-semibold text-fg sm:text-[28px]">{title}</h1>
           {subtitle && <p className="mt-1 text-sm text-fg-2">{subtitle}</p>}
         </div>
       </div>
@@ -206,7 +206,7 @@ export function TabNav<T extends string>({ value, onChange, tabs }: { value: T; 
             aria-selected={value === t.value}
             onClick={() => onChange(t.value)}
             className={cn(
-              '-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2.5 text-sm font-medium whitespace-nowrap transition-colors',
+              '-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2.5 font-display text-sm font-medium whitespace-nowrap transition-colors',
               value === t.value ? 'border-[var(--accent)] text-fg' : 'border-transparent text-muted hover:text-fg',
             )}
           >

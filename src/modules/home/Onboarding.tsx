@@ -35,7 +35,7 @@ export function Onboarding() {
   }
 
   return (
-    <section className="animate-fade-up relative mb-6 overflow-hidden rounded-2xl border border-line bg-surface p-5 shadow-card sm:p-6" aria-labelledby="onboarding-title">
+    <section className="animate-fade-up relative mb-6 overflow-hidden glass-card rounded-2xl p-5 sm:p-6" aria-labelledby="onboarding-title">
       <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[var(--accent)] opacity-20 blur-3xl" />
       <button className="absolute top-4 right-4 text-muted hover:text-fg" aria-label="Dismiss onboarding" onClick={() => updateSettings({ onboarded: true })}>
         <X className="h-4 w-4" />
@@ -45,7 +45,7 @@ export function Onboarding() {
           <div className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-accent-soft px-2.5 py-1 text-xs font-medium text-accent">
             <Sparkles className="h-3.5 w-3.5" /> Welcome to Personal HQ
           </div>
-          <h2 id="onboarding-title" className="font-display text-2xl font-semibold text-fg">
+          <h2 id="onboarding-title" className="text-2xl font-semibold text-fg">
             Let's set up your HQ
           </h2>
           <p className="mt-1 max-w-lg text-sm text-fg-2">Everything is stored privately in this browser. Nothing is pre-filled — your dashboards calculate only from what you record.</p>
@@ -82,7 +82,7 @@ export function Onboarding() {
           <p className="mt-2 text-xs text-muted">Demo rows are labelled “[Demo]” and can be removed in one click.</p>
         </div>
         <div className="space-y-2.5">
-          <p className="text-xs font-medium tracking-wide text-muted uppercase">Suggested next steps</p>
+          <p className="label-os text-muted">Suggested next steps</p>
           <Link to="/wealth/holdings?add=sip" className="flex items-center gap-3 rounded-xl border border-line p-3 hover:border-line-strong">
             <TrendingUp className="h-4 w-4 text-wealth" />
             <span className="text-sm text-fg-2">Add your Groww SIPs and HDFC fixed deposit</span>

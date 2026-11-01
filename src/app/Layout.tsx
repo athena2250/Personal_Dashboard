@@ -3,6 +3,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router'
 import {
   CalendarDays,
   Check,
+  ChevronRight,
   CircleAlert,
   GraduationCap,
   LayoutDashboard,
@@ -10,7 +11,6 @@ import {
   Menu,
   Moon,
   Plus,
-  Search,
   Settings as SettingsIcon,
   Sun,
   TrendingUp,
@@ -23,10 +23,10 @@ import { useSaveStatus } from '@/data/saveStatus'
 import { useDemoCount, useTrackers } from '@/data/hooks'
 import { updateSettings } from '@/data/repos/settings'
 import { cn } from '@/lib/util'
-import { Kbd } from '@/components/ui/display'
 import { Button } from '@/components/ui/Button'
 import { TrackerIcon } from '@/components/ui/Icon'
 import { CommandPalette } from './CommandPalette'
+import { SearchButton, type LayoutOutletContext } from './SearchButton'
 import { useQuickAdd, type QuickKind } from './QuickAdd'
 import { useApp } from './AppContext'
 import { useReminderNotifications } from '@/modules/events/useReminders'
@@ -41,7 +41,6 @@ const NAV = [
 ]
 
 const QUICK: { kind: QuickKind; label: string }[] = [
-  { kind: 'task', label: 'Task' },
   { kind: 'session', label: 'Learning session' },
   { kind: 'expense', label: 'Expense' },
   { kind: 'income', label: 'Income' },
@@ -86,30 +85,63 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const personal = trackers?.filter((t) => t.section === 'personal') ?? []
   const { pathname } = useLocation()
   const linkCls = ({ isActive }: { isActive: boolean }) =>
-    cn('group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-colors', isActive ? 'bg-surface-2 text-fg shadow-[inset_0_0_0_1px_var(--line)]' : 'text-fg-2 hover:bg-surface-2/60 hover:text-fg')
+    cn('group flex items-center gap-3 rounded-xl px-3 py-2 font-display text-sm font-medium transition-colors', isActive ? 'bg-surface-2 text-fg shadow-[inset_0_0_0_1px_var(--line)]' : 'text-fg-2 hover:bg-surface-2/60 hover:text-fg')
   const subCls = ({ isActive }: { isActive: boolean }) => cn('flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] transition-colors', isActive ? 'text-fg bg-surface-2/70' : 'text-muted hover:text-fg')
   const inLearning = pathname.startsWith('/learning') || learning.some((t) => pathname.startsWith(`/trackers/${t.id}`))
+  // Expands automatically when entering a Learning page; the chevron (or re-clicking "Learning Hub") toggles it.
+  const [learnOpen, setLearnOpen] = useState(inLearning)
+  const [wasInLearning, setWasInLearning] = useState(inLearning)
+  if (inLearning !== wasInLearning) {
+    setWasInLearning(inLearning)
+    if (inLearning) setLearnOpen(true)
+  }
 
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-2.5 px-3 pt-1 pb-6">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#5ac8fa] to-[#007aff] shadow-[0_6px_20px_-6px_rgba(0,122,255,0.6)]">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--accent-2)] to-[var(--accent)] shadow-[0_6px_20px_-6px_var(--accent)]">
           <Sparkles className="h-4.5 w-4.5 text-white" />
         </div>
         <div>
-          <div className="text-[15px] font-semibold tracking-tight text-fg">Personal HQ</div>
-          <div className="text-[11px] text-muted">Your operating system</div>
+          <div className="font-display text-[15px] font-semibold text-fg">Personal HQ</div>
+          <div className="label-os mt-0.5 text-[9.5px] text-muted">Your operating system</div>
         </div>
       </div>
       <nav className="flex-1 space-y-1 overflow-y-auto" aria-label="Main">
         {NAV.map((n) => (
           <div key={n.to}>
-            <NavLink to={n.to} end={n.end} className={(p) => linkCls({ isActive: p.isActive || (n.to === '/learning' && inLearning) })} onClick={onNavigate}>
-              <n.icon className="h-4.5 w-4.5" style={{ color: n.color }} />
-              {n.label}
-            </NavLink>
-            {n.to === '/learning' && inLearning && (
-              <div className="mt-1 mb-2 ml-5 space-y-0.5 border-l border-line pl-3">
+            {n.to === '/learning' ? (
+              <div className="relative">
+                <NavLink
+                  to={n.to}
+                  className={(p) => cn(linkCls({ isActive: p.isActive || inLearning }), 'pr-10')}
+                  onClick={() => {
+                    if (pathname === '/learning') setLearnOpen((o) => !o)
+                    else onNavigate?.()
+                  }}
+                >
+                  <n.icon className="h-4.5 w-4.5" style={{ color: n.color }} />
+                  {n.label}
+                </NavLink>
+                <button
+                  type="button"
+                  onClick={() => setLearnOpen((o) => !o)}
+                  aria-expanded={learnOpen}
+                  aria-controls="learning-subnav"
+                  aria-label={learnOpen ? 'Collapse Learning Hub' : 'Expand Learning Hub'}
+                  className="absolute top-1/2 right-1.5 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-3/60 hover:text-fg"
+                >
+                  <ChevronRight className={cn('h-4 w-4 transition-transform duration-200', learnOpen && 'rotate-90')} />
+                </button>
+              </div>
+            ) : (
+              <NavLink to={n.to} end={n.end} className={linkCls} onClick={onNavigate}>
+                <n.icon className="h-4.5 w-4.5" style={{ color: n.color }} />
+                {n.label}
+              </NavLink>
+            )}
+            {n.to === '/learning' && learnOpen && (
+              <div id="learning-subnav" className="mt-1 mb-2 ml-5 space-y-0.5 border-l border-line pl-3">
                 {learning.map((t) => (
                   <NavLink key={t.id} to={`/trackers/${t.id}`} className={subCls} onClick={onNavigate}>
                     <TrackerIcon name={t.icon} color={t.color} boxed={false} className="h-3.5 w-3.5" />
@@ -123,7 +155,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             )}
           </div>
         ))}
-        <div className="pt-5 pb-1.5 pl-3 text-[11px] font-medium tracking-wide text-muted uppercase">Collections</div>
+        <div className="label-os pt-5 pb-1.5 pl-3 text-muted">Collections</div>
         {personal.map((t) => (
           <NavLink key={t.id} to={`/trackers/${t.id}`} className={linkCls} onClick={onNavigate}>
             <TrackerIcon name={t.icon} color={t.color} boxed={false} className="h-4.5 w-4.5" />
@@ -263,17 +295,8 @@ export function Layout() {
             <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setDrawer(true)} aria-label="Open menu">
               <Menu className="h-5 w-5" />
             </Button>
-            <button
-              onClick={() => setPaletteOpen(true)}
-              className="flex h-9 max-w-md flex-1 items-center gap-2 rounded-xl border border-line bg-surface-2/70 px-3 text-sm text-muted transition-colors hover:border-line-strong"
-              aria-label="Search everything"
-            >
-              <Search className="h-4 w-4" />
-              <span className="flex-1 truncate text-left">Search everything…</span>
-              <span className="hidden sm:inline">
-                <Kbd>⌘K</Kbd>
-              </span>
-            </button>
+            {/* Overview shows the search bar beside its greeting instead. */}
+            {location.pathname !== '/' && <SearchButton onClick={() => setPaletteOpen(true)} className="max-w-md flex-1" />}
             <div className="ml-auto flex items-center gap-1.5 sm:gap-3">
               <span className="hidden md:block">
                 <SaveIndicator />
@@ -285,7 +308,7 @@ export function Layout() {
         </header>
         <main id="main" className="mx-auto max-w-[1400px] px-4 pt-6 pb-28 sm:px-6 lg:pb-12">
           <DemoBanner />
-          <Outlet />
+          <Outlet context={{ openPalette: () => setPaletteOpen(true) } satisfies LayoutOutletContext} />
         </main>
       </div>
 
@@ -301,7 +324,7 @@ export function Layout() {
         </div>
       </nav>
       <button
-        className="fixed right-4 bottom-20 z-30 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#5ac8fa] to-[#007aff] text-white shadow-xl lg:hidden"
+        className="fixed right-4 bottom-20 z-30 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--accent-2)] to-[var(--accent)] text-white shadow-xl lg:hidden"
         aria-label="Quick add or search"
         onClick={() => setPaletteOpen(true)}
       >

@@ -1,11 +1,10 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
-import { TaskFormModal } from '@/modules/home/TaskForm'
 import { SessionFormModal } from '@/modules/learning/SessionForm'
 import { TransactionFormModal } from '@/modules/spending/TransactionForm'
 import { InvestmentFormModal, InvTxnFormModal, ValuationFormModal } from '@/modules/wealth/forms'
 import { EventFormModal } from '@/modules/events/EventForm'
 
-export type QuickKind = 'task' | 'session' | 'expense' | 'income' | 'investment' | 'invEntry' | 'valuation' | 'event'
+export type QuickKind = 'session' | 'expense' | 'income' | 'investment' | 'invEntry' | 'valuation' | 'event'
 
 interface QuickState {
   kind: QuickKind
@@ -26,7 +25,6 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
   return (
     <Ctx.Provider value={useMemo(() => open, [open])}>
       {children}
-      <TaskFormModal open={k === 'task'} onClose={close} />
       <SessionFormModal open={k === 'session'} onClose={close} trackerId={state?.trackerId} />
       <TransactionFormModal open={k === 'expense' || k === 'income'} onClose={close} presetType={k === 'income' ? 'income' : 'expense'} />
       <InvestmentFormModal open={k === 'investment'} onClose={close} />

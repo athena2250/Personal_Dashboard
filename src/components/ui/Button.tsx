@@ -8,7 +8,7 @@ type Size = 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm'
 
 const variants: Record<Variant, string> = {
   primary:
-    'bg-gradient-to-br from-[var(--accent)] to-[color-mix(in_oklab,var(--accent)_70%,var(--accent-2))] text-white shadow-[0_6px_20px_-8px_var(--accent)] hover:brightness-110',
+    'bg-gradient-to-br from-[var(--accent-strong)] to-[color-mix(in_oklab,var(--accent-strong)_70%,var(--accent-2))] text-white shadow-[0_6px_20px_-8px_var(--accent)] hover:brightness-110',
   secondary: 'bg-surface-2 text-fg border border-line hover:bg-surface-3 hover:border-line-strong',
   ghost: 'text-fg-2 hover:text-fg hover:bg-surface-2',
   danger: 'bg-bad/90 text-white hover:bg-bad',

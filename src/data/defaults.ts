@@ -10,13 +10,12 @@ export const SCHEMA_VERSION = 1
 
 export const DEFAULT_WIDGETS: WidgetPref[] = [
   { id: 'quickActions', visible: true },
-  { id: 'today', visible: true },
   { id: 'learning', visible: true },
   { id: 'spending', visible: true },
   { id: 'wealth', visible: true },
   { id: 'events', visible: true },
-  { id: 'heatmap', visible: true },
-  { id: 'trackers', visible: true },
+  { id: 'heatmap', visible: false },
+  { id: 'trackers', visible: false },
 ]
 
 export const DEFAULT_EVENT_CATEGORIES: EventCategory[] = [
@@ -77,6 +76,7 @@ const DSA_TOPICS = [
   'Backtracking',
   'Math',
   'System design',
+  'SQL',
   'Other',
 ]
 export const AI_AREAS = ['AI fundamentals', 'Machine Learning', 'Deep Learning', 'Generative AI', 'Agentic AI', 'MLOps', 'Math & statistics']

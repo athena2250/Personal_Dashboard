@@ -37,9 +37,6 @@ export function useRecords(trackerId?: string, kind?: string) {
   }, [trackerId, kind])
 }
 
-export function useTasks() {
-  return useLiveQuery(() => db.tasks.toArray(), [])
-}
 
 export function useTransactions() {
   return useLiveQuery(() => db.transactions.orderBy('date').reverse().toArray(), [])
