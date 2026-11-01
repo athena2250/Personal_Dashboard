@@ -7,6 +7,8 @@ import { icsProxyPlugin } from './server/icsProxy'
 import { pgSyncPlugin } from './server/pgSync'
 
 export default defineConfig({
+  // GitHub Pages serves from /<repo>/; set BASE_PATH in that build only.
+  base: process.env.BASE_PATH ?? '/',
   plugins: [react(), tailwindcss(), icsProxyPlugin(), pgSyncPlugin()],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },

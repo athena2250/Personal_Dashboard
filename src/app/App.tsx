@@ -123,7 +123,7 @@ const router = createBrowserRouter([
       },
     ],
   },
-])
+], { basename: import.meta.env.BASE_URL.replace(/\/$/, '') || '/' })
 
 export function App() {
   return <RouterProvider router={router} />
