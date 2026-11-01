@@ -136,7 +136,7 @@ export function WealthOverview() {
           <CardHeader title="Coming up" icon={<CalendarClock className="h-4 w-4 text-muted" />} />
           <CardBody className="space-y-4">
             <div>
-              <p className="mb-1.5 text-[11px] font-medium tracking-wide text-muted uppercase">SIP installments</p>
+              <p className="label-os mb-1.5 text-muted">SIP installments</p>
               {sipsDue.length === 0 ? (
                 <p className="text-xs text-muted">No active SIPs.</p>
               ) : (
@@ -155,7 +155,7 @@ export function WealthOverview() {
               )}
             </div>
             <div>
-              <p className="mb-1.5 text-[11px] font-medium tracking-wide text-muted uppercase">FD maturities</p>
+              <p className="label-os mb-1.5 text-muted">FD maturities</p>
               {maturing.length === 0 ? (
                 <p className="text-xs text-muted">None upcoming.</p>
               ) : (

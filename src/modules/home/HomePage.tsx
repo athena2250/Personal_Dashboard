@@ -1,32 +1,31 @@
 import { useState, type ReactNode } from 'react'
-import { useSearchParams } from 'react-router'
-import { ArrowDown, ArrowUp, Eye, EyeOff, GripVertical, LayoutGrid, RotateCcw, Sparkles } from 'lucide-react'
+import { ArrowDown, ArrowUp, Eye, EyeOff, GripVertical, LayoutGrid, RotateCcw } from 'lucide-react'
 import type { WidgetId, WidgetPref } from '@/data/models'
 import { updateSettings } from '@/data/repos/settings'
 import { DEFAULT_WIDGETS } from '@/data/defaults'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/feedback'
 import { useApp } from '@/app/AppContext'
+import { SearchButton, usePalette } from '@/app/SearchButton'
 import { formatDate } from '@/lib/dates'
 import { zonedParts } from '@/lib/tz'
 import { cn } from '@/lib/util'
-import { EventsWidget, HeatmapWidget, LearningWidget, QuickActionsWidget, SpendingWidget, TodayWidget, TrackersWidget, WealthWidget } from './widgets'
+import { EventsWidget, HeatmapWidget, LearningWidget, QuickActionsWidget, SpendingWidget, TrackersWidget, WealthWidget } from './widgets'
 import { Onboarding } from './Onboarding'
+import banner from '@/assets/hq-banner.jpg'
 
 export const WIDGET_META: Record<WidgetId, { label: string; span: string }> = {
   quickActions: { label: 'Quick actions', span: 'lg:col-span-12' },
-  today: { label: 'Today: tasks & events', span: 'lg:col-span-8' },
-  learning: { label: 'Learning progress', span: 'lg:col-span-4' },
-  spending: { label: 'Spending summary', span: 'md:col-span-1 lg:col-span-4' },
-  wealth: { label: 'Wealth overview', span: 'md:col-span-1 lg:col-span-4' },
-  events: { label: 'Upcoming events', span: 'md:col-span-2 lg:col-span-4' },
+  learning: { label: 'Learning progress', span: 'md:col-span-1 lg:col-span-6' },
+  spending: { label: 'Spending summary', span: 'md:col-span-1 lg:col-span-6' },
+  wealth: { label: 'Wealth overview', span: 'md:col-span-1 lg:col-span-6' },
+  events: { label: 'Upcoming events', span: 'md:col-span-1 lg:col-span-6' },
   heatmap: { label: 'Learning heatmap', span: 'lg:col-span-12' },
   trackers: { label: 'All trackers', span: 'lg:col-span-12' },
 }
 
 function greeting(hour: number) {
-  if (hour < 5) return 'Working late'
-  if (hour < 12) return 'Good morning'
+  if (hour >= 5 && hour < 12) return 'Good morning'
   if (hour < 17) return 'Good afternoon'
   return 'Good evening'
 }
@@ -34,11 +33,11 @@ function greeting(hour: number) {
 export function HomePage() {
   const { settings, today } = useApp()
   const toast = useToast()
-  const [params] = useSearchParams()
   const [editing, setEditing] = useState(false)
   const [dragId, setDragId] = useState<WidgetId | null>(null)
   const widgets = settings.dashboardWidgets
   const hour = zonedParts(Date.now()).hour
+  const openPalette = usePalette()
 
   const save = (next: WidgetPref[]) => updateSettings({ dashboardWidgets: next }).catch(toast.error)
   const move = (id: WidgetId, dir: -1 | 1) => {
@@ -63,8 +62,6 @@ export function HomePage() {
     switch (id) {
       case 'quickActions':
         return <QuickActionsWidget />
-      case 'today':
-        return <TodayWidget openTaskId={params.get('task')} />
       case 'learning':
         return <LearningWidget />
       case 'spending':
@@ -84,25 +81,37 @@ export function HomePage() {
 
   return (
     <div className="animate-fade-up">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="text-sm text-muted">{formatDate(today, 'long')}</p>
-          <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight text-fg sm:text-4xl">
+      <img
+        src={banner}
+        alt="Personal HQ: Life · Work · Study · Build · Grow"
+        width={2172}
+        height={724}
+        className="mb-8 aspect-[3/1] w-full rounded-2xl border border-line object-cover shadow-card"
+      />
+      <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="shrink-0">
+          <p className="label-os text-muted">{formatDate(today, 'long')}</p>
+          <h1 className="mt-2 text-[28px] font-semibold text-fg sm:text-[34px]">
             {greeting(hour)}
-            {settings.name ? `, ${settings.name}` : ''}
-            <Sparkles className="ml-2 inline h-6 w-6 text-accent" aria-hidden />
+            {settings.name ? `, ${settings.name}` : ''}!
           </h1>
-          <p className="mt-1 text-sm text-fg-2">Here's your learning, money and schedule at a glance.</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2 sm:w-full sm:max-w-md">
+          <SearchButton onClick={openPalette} className="min-w-0 flex-1" />
           {editing && (
             <Button variant="ghost" size="sm" icon={<RotateCcw className="h-3.5 w-3.5" />} onClick={() => save(DEFAULT_WIDGETS)}>
               Reset layout
             </Button>
           )}
-          <Button variant={editing ? 'primary' : 'secondary'} size="sm" icon={<LayoutGrid className="h-3.5 w-3.5" />} onClick={() => setEditing((e) => !e)} aria-pressed={editing}>
-            {editing ? 'Done' : 'Customize'}
-          </Button>
+          {editing ? (
+            <Button variant="primary" size="sm" onClick={() => setEditing(false)} aria-pressed>
+              Done
+            </Button>
+          ) : (
+            <Button variant="ghost" size="icon-sm" onClick={() => setEditing(true)} aria-label="Customize dashboard" title="Customize dashboard">
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
 
@@ -110,7 +119,7 @@ export function HomePage() {
 
       {editing && <p className="mb-4 rounded-xl border border-dashed border-line-strong px-4 py-3 text-xs text-fg-2">Drag widgets to reorder (or use the arrows), and use the eye button to show or hide them. Changes save automatically.</p>}
 
-      <div className="grid grid-flow-dense grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-12">
+      <div className="grid grid-flow-dense grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-12">
         {shown.map((w, i) => (
           <div
             key={w.id}

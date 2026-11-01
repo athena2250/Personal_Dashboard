@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import type { LearningSession } from '@/data/models'
 import { heatmapGrid, type HeatCell } from '@/domain/activity'
 import { formatDate, formatMinutes, weekdayShort, type ISODate } from '@/lib/dates'
@@ -22,6 +23,13 @@ export function Heatmap({
 }) {
   const grid = useMemo(() => heatmapGrid(sessions, today, weeks, weekStartsOn), [sessions, today, weeks, weekStartsOn])
   const [hover, setHover] = useState<{ cell: HeatCell; x: number; y: number } | null>(null)
+  // The tooltip is position:fixed from the cell's viewport rect, so drop it once the page scrolls.
+  useEffect(() => {
+    if (!hover) return
+    const clear = () => setHover(null)
+    window.addEventListener('scroll', clear, { capture: true, passive: true })
+    return () => window.removeEventListener('scroll', clear, { capture: true })
+  }, [hover])
   const width = weeks * (CELL + GAP)
   const height = 7 * (CELL + GAP)
   const LEFT = 26
@@ -81,7 +89,7 @@ export function Heatmap({
           )}
         </svg>
       </div>
-      <div className="mt-2 flex items-center justify-between text-[11px] text-muted">
+      <div className="tabular mt-2 flex items-center justify-between text-[11px] text-muted">
         <span>{totalDays} active days</span>
         <span className="flex items-center gap-1">
           Less
@@ -91,12 +99,16 @@ export function Heatmap({
           More
         </span>
       </div>
-      {hover && (
-        <div className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded-lg border border-line-strong bg-surface px-2.5 py-1.5 text-xs shadow-xl" style={{ left: hover.x + CELL / 2, top: hover.y - 6 }}>
-          <div className="font-medium text-fg">{formatDate(hover.cell.date, 'weekday')}</div>
-          <div className="text-muted">{hover.cell.sessions ? `${hover.cell.sessions} session${hover.cell.sessions > 1 ? 's' : ''} · ${formatMinutes(hover.cell.minutes)}` : 'No activity'}</div>
-        </div>
-      )}
+      {/* Portalled to <body>: an animated/transformed ancestor would otherwise become the containing block for
+          position:fixed and offset the tooltip away from the hovered cell. */}
+      {hover &&
+        createPortal(
+          <div className="pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-full rounded-lg border border-line-strong bg-surface px-2.5 py-1.5 text-xs shadow-xl" style={{ left: hover.x + CELL / 2, top: hover.y - 6 }}>
+            <div className="font-medium text-fg">{formatDate(hover.cell.date, 'weekday')}</div>
+            <div className="text-muted">{hover.cell.sessions ? `${hover.cell.sessions} session${hover.cell.sessions > 1 ? 's' : ''} · ${formatMinutes(hover.cell.minutes)}` : 'No activity'}</div>
+          </div>,
+          document.body,
+        )}
     </div>
   )
 }

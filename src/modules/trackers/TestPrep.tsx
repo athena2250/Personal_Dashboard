@@ -1,8 +1,7 @@
 import { useMemo, useState } from 'react'
 import { BookA, CalendarClock, Check, Pencil, Plus, RotateCcw, Search, Settings2, Target, Trash2, Trophy } from 'lucide-react'
-import type { LearningSession, Task, Tracker, TrackerRecord } from '@/data/models'
+import type { LearningSession, Tracker, TrackerRecord } from '@/data/models'
 import { addRecord, deleteRecord, updateRecord, updateTracker } from '@/data/repos/trackers'
-import { useTasks } from '@/data/hooks'
 import { DEFAULT_TESTPREP_CONFIG, type TestPrepConfig } from '@/data/defaults'
 import { breakdownByAttr } from '@/domain/activity'
 import { Button } from '@/components/ui/Button'
@@ -16,7 +15,6 @@ import { useSubmit } from '@/components/useSubmit'
 import { useApp } from '@/app/AppContext'
 import { addDays, diffDays, formatDate, formatHours, relativeDays } from '@/lib/dates'
 import { cn } from '@/lib/util'
-import { TaskFormModal } from '@/modules/home/TaskForm'
 
 export function getConfig(t: Tracker): TestPrepConfig {
   const c = t.config as Partial<TestPrepConfig>
@@ -107,8 +105,8 @@ export function TestPrepOverview({ tracker, sessions, records }: { tracker: Trac
               />
               <CardBody>
                 <div className="mb-4 flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold text-fg">{total ?? '—'}</span>
-                  <span className="text-sm text-muted">/ target {target}</span>
+                  <span className="stat-figure text-3xl text-fg">{total ?? '—'}</span>
+                  <span className="tabular text-sm text-muted">/ target {target}</span>
                   {total != null && <Badge tone={total >= target ? 'good' : 'warn'}>{total >= target ? 'On target' : `${target - total} to go`}</Badge>}
                 </div>
                 <ul className="space-y-3">
@@ -479,12 +477,9 @@ function VocabForm({ record, onDone }: { record: TrackerRecord; onDone: () => vo
 
 /* ───────────── Revision schedule ───────────── */
 
-export function RevisionSchedule({ tracker, records }: { tracker: Tracker; records: TrackerRecord[] }) {
+export function RevisionSchedule({ records }: { records: TrackerRecord[] }) {
   const { today } = useApp()
   const toast = useToast()
-  const tasks = useTasks()
-  const [taskEdit, setTaskEdit] = useState<Task | undefined>()
-  const [addingTask, setAddingTask] = useState(false)
   const topics = useMemo(
     () =>
       records
@@ -492,11 +487,10 @@ export function RevisionSchedule({ tracker, records }: { tracker: Tracker; recor
         .sort((a, b) => ((a.values.revisionDate as string) ?? '9999').localeCompare((b.values.revisionDate as string) ?? '9999')),
     [records],
   )
-  const studyTasks = (tasks ?? []).filter((t) => t.trackerId === tracker.id && !t.done).sort((a, b) => (a.dueDate ?? '9999').localeCompare(b.dueDate ?? '9999'))
   const reschedule = (r: TrackerRecord, days: number) => updateRecord(r.id, { values: { ...r.values, revisionDate: addDays(today, days) } }).then(() => toast.success(`Next revision ${relativeDays(addDays(today, days), today).toLowerCase()}`)).catch(toast.error)
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div>
       <Card>
         <CardHeader title="Topics to revise" subtitle="From topics marked “Needs revision” or with a revision date" icon={<span className="flex h-8 w-8 items-center justify-center rounded-xl bg-warn/15 text-warn"><RotateCcw className="h-4 w-4" /></span>} />
         <CardBody>
@@ -531,35 +525,6 @@ export function RevisionSchedule({ tracker, records }: { tracker: Tracker; recor
           )}
         </CardBody>
       </Card>
-      <Card>
-        <CardHeader
-          title="Upcoming study tasks"
-          subtitle="Tasks linked to this tracker"
-          action={
-            <Button size="sm" variant="ghost" icon={<Plus className="h-3.5 w-3.5" />} onClick={() => setAddingTask(true)}>
-              Task
-            </Button>
-          }
-        />
-        <CardBody>
-          {studyTasks.length === 0 ? (
-            <EmptyState compact title="No study tasks" description="Create a task and link it to GRE / TOEFL." />
-          ) : (
-            <ul className="divide-y divide-line">
-              {studyTasks.map((t) => (
-                <li key={t.id} className="flex items-center justify-between py-2.5">
-                  <button className="text-left text-sm text-fg hover:underline" onClick={() => setTaskEdit(t)}>
-                    {t.title}
-                  </button>
-                  <span className={cn('text-xs', t.dueDate && t.dueDate < today ? 'text-bad-fg' : 'text-muted')}>{t.dueDate ? relativeDays(t.dueDate, today) : 'No date'}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </CardBody>
-      </Card>
-      <TaskFormModal open={!!taskEdit} onClose={() => setTaskEdit(undefined)} task={taskEdit} />
-      <TaskFormModal open={addingTask} onClose={() => setAddingTask(false)} preset={{ trackerId: tracker.id }} />
     </div>
   )
 }

@@ -3,7 +3,7 @@
  * `removeDemoData()` deletes exactly those rows and nothing else.
  */
 import { db, DEMO_TABLES } from './db'
-import type { Budget, CalendarEvent, Investment, InvestmentTxn, LearningSession, RecurringRule, Task, TrackerRecord, Transaction, Valuation } from './models'
+import type { Budget, CalendarEvent, Investment, InvestmentTxn, LearningSession, RecurringRule, TrackerRecord, Transaction, Valuation } from './models'
 import { TOTAL_BUDGET } from './models'
 import { tracked } from './saveStatus'
 import { stamp } from './repos/base'
@@ -59,11 +59,6 @@ export function loadDemoData(today: ISODate, baseCurrency: string) {
       stamp<TrackerRecord>({ demo, trackerId: 'testprep', kind: 'vocab', title: 'Obdurate', values: { meaning: 'Stubbornly refusing to change', mastered: true }, milestones: [] }),
     ]
 
-    const tasks: Task[] = [
-      stamp<Task>({ demo, title: '[Demo] Review DP notes', done: false, priority: 'high', dueDate: today, trackerId: 'coding' }),
-      stamp<Task>({ demo, title: '[Demo] Pay credit card bill', done: false, priority: 'medium', dueDate: addDays(today, 2) }),
-      stamp<Task>({ demo, title: '[Demo] Book TOEFL slot', done: true, priority: 'low', dueDate: addDays(today, -1) }),
-    ]
 
     // Transactions over 4 months
     const txs: Transaction[] = []
@@ -138,7 +133,6 @@ export function loadDemoData(today: ISODate, baseCurrency: string) {
     await db.transaction('rw', DEMO_TABLES.map((t) => db.table(t)), async () => {
       await db.sessions.bulkAdd(sessions)
       await db.records.bulkAdd(records)
-      await db.tasks.bulkAdd(tasks)
       await db.transactions.bulkAdd(txs)
       await db.recurring.bulkAdd(recurring)
       await db.budgets.bulkAdd(budgets)

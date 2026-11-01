@@ -15,7 +15,6 @@ export interface BaseRow {
 
 export type WidgetId =
   | 'quickActions'
-  | 'today'
   | 'learning'
   | 'spending'
   | 'wealth'

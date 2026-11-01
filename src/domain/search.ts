@@ -1,9 +1,9 @@
 /**
  * Global search across all modules. Pure: callers pass the collections in.
  */
-import type { CalendarEvent, Investment, LearningSession, Task, Tracker, TrackerRecord, Transaction } from '@/data/models'
+import type { CalendarEvent, Investment, LearningSession, Tracker, TrackerRecord, Transaction } from '@/data/models'
 
-export type SearchKind = 'task' | 'session' | 'record' | 'transaction' | 'investment' | 'event' | 'tracker'
+export type SearchKind = 'session' | 'record' | 'transaction' | 'investment' | 'event' | 'tracker'
 
 export interface SearchResult {
   kind: SearchKind
@@ -16,7 +16,6 @@ export interface SearchResult {
 }
 
 export interface SearchCorpus {
-  tasks: Task[]
   sessions: LearningSession[]
   records: TrackerRecord[]
   trackers: Tracker[]
@@ -52,9 +51,6 @@ export function globalSearch(corpus: SearchCorpus, raw: string, limit = 40): Sea
 
   for (const t of corpus.trackers) {
     push({ kind: 'tracker', id: t.id, title: t.name, subtitle: t.description || 'Tracker', href: `/trackers/${t.id}` }, [t.name, t.description])
-  }
-  for (const t of corpus.tasks) {
-    push({ kind: 'task', id: t.id, title: t.title, subtitle: t.done ? 'Completed task' : 'Task', date: t.dueDate, href: '/?task=' + t.id }, [t.title, t.notes])
   }
   for (const s of corpus.sessions) {
     const attrs = Object.values(s.attrs ?? {}).map(String)

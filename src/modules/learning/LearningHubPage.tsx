@@ -83,7 +83,7 @@ export function LearningHubPage() {
           const goal = weeklyMinuteGoal(t)
           const spark = weeklySeries(stats.sessions.filter((s) => s.trackerId === t.id), today, 10, settings.weekStartsOn).map((w) => w.minutes)
           return (
-            <Link key={t.id} to={`/trackers/${t.id}`} className="group rounded-2xl border border-line bg-surface p-4 shadow-card transition-all hover:-translate-y-0.5 hover:border-line-strong">
+            <Link key={t.id} to={`/trackers/${t.id}`} className="group glass-card rounded-2xl p-4 transition-all hover:-translate-y-0.5 hover:border-line-strong hover:bg-[var(--glass-card-hover)]">
               <div className="flex items-center gap-3">
                 <TrackerIcon name={t.icon} color={t.color} />
                 <div className="min-w-0">

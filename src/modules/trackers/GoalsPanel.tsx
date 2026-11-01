@@ -85,7 +85,7 @@ export function GoalsPanel({ tracker, sessions, records, compact }: { tracker: T
         )}
         {!compact && deadlines.length > 0 && (
           <div className="mt-5 border-t border-line pt-4">
-            <p className="mb-2 text-[11px] font-medium tracking-wide text-muted uppercase">Upcoming deadlines</p>
+            <p className="label-os mb-2 text-muted">Upcoming deadlines</p>
             <ul className="space-y-1.5">
               {deadlines.map((r) => (
                 <li key={r.id} className="flex items-center justify-between gap-2 text-sm">

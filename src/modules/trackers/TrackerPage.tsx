@@ -123,7 +123,7 @@ export function TrackerPage() {
       {tab === 'records' && <RecordsView tracker={tracker} records={items} sessions={sessions} openRecordId={params.get('record')} onOpened={() => setParams({ tab: 'records' }, { replace: true })} />}
       {tab === 'mocks' && <MockTests tracker={tracker} records={records} />}
       {tab === 'vocab' && <Vocabulary tracker={tracker} records={records} />}
-      {tab === 'revision' && <RevisionSchedule tracker={tracker} records={records} />}
+      {tab === 'revision' && <RevisionSchedule records={records} />}
       {tab === 'goals' && (
         <div className="max-w-2xl">
           <GoalsPanel tracker={tracker} sessions={sessions} records={records} />
@@ -202,17 +202,17 @@ function Overview({ tracker, sessions, records }: { tracker: import('@/data/mode
           <CardBody className="pt-4">
             <div className="mb-4 flex flex-wrap gap-6">
               <div>
-                <div className="text-2xl font-semibold text-fg">{formatMinutes(sumMinutes(inPeriod))}</div>
+                <div className="stat-figure text-2xl text-fg">{formatMinutes(sumMinutes(inPeriod))}</div>
                 <Delta value={changePct(sumMinutes(inPeriod), sumMinutes(inPrev))} suffix={`vs previous ${view}`} />
               </div>
               <div>
-                <div className="text-2xl font-semibold text-fg">{inPeriod.length}</div>
-                <div className="text-xs text-muted">sessions</div>
+                <div className="stat-figure text-2xl text-fg">{inPeriod.length}</div>
+                <div className="label-os mt-0.5 text-muted">sessions</div>
               </div>
               {tracker.countLabel && (
                 <div>
-                  <div className="text-2xl font-semibold text-fg">{count}</div>
-                  <div className="text-xs text-muted">{tracker.countLabel.toLowerCase()}</div>
+                  <div className="stat-figure text-2xl text-fg">{count}</div>
+                  <div className="label-os mt-0.5 text-muted">{tracker.countLabel}</div>
                 </div>
               )}
             </div>
